@@ -1,0 +1,1 @@
+# cf-game-template

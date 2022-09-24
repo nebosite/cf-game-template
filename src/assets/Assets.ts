@@ -2,7 +2,7 @@ import logo from './images/Logo.png'
 import ding from './sounds/ding.wav'
 import hello from './sounds/hello.mp3'
 import response from './sounds/response.mp3'
-const TestoramaAssets =
+const TemplatoAssets =
 {
     images: {
         logo
@@ -14,4 +14,4 @@ const TestoramaAssets =
     }
 }
 
-export default TestoramaAssets
+export default TemplatoAssets

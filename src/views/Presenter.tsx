@@ -1,21 +1,20 @@
 // App Navigation handled here
 import React from "react";
 import { observer, inject } from "mobx-react";
-import { TestoramaGameState, TestoramaGameEvent, TestoramaPresenterModel } from "../models/TestoramaPresenterModel";
-import { UIProperties, UINormalizer } from "libs";
-import styles from './TestoramaPresenter.module.css';
+import { UIProperties, UINormalizer, DevUI } from "clusterfun-client";
+import styles from "./Presenter.module.css"
 import classNames from "classnames";
-import { MediaHelper } from "libs/Media/MediaHelper";
-import { PresenterGameEvent, PresenterGameState } from "libs/models/ClusterfunPresenterModel";
-import { GeneralGameState } from "libs/models/BaseGameModel";
-import DevUI from "libs/components/DevUIComponent";
-import { BaseAnimationController } from "libs/Animation/AnimationController";
+import { MediaHelper } from "clusterfun-client";
+import { PresenterGameEvent, PresenterGameState, GeneralGameState } from "clusterfun-client";
+import { BaseAnimationController } from "clusterfun-client";
 import { observable } from "mobx";
-import TestoramaAssets from "../assets/TestoramaAssets";
-import { TestoramaVersion } from "../models/TestoramaGameSettings";
+import TemplatoAssets from "../assets/Assets";
+import { TemplatoVersion } from "../models/GameSettings";
+import { TemplatoGameEvent, TemplatoGameState, TemplatoPresenterModel } from "models/PresenterModel";
+
 
 @inject("appModel") @observer
-class GatheringPlayersPage  extends React.Component<{appModel?: TestoramaPresenterModel}> {
+class GatheringPlayersPage  extends React.Component<{appModel?: TemplatoPresenterModel}> {
     // -------------------------------------------------------------------
     // render
     // -------------------------------------------------------------------
@@ -49,7 +48,7 @@ class GatheringPlayersPage  extends React.Component<{appModel?: TestoramaPresent
 }
 
 @inject("appModel") @observer
-class PausedGamePage  extends React.Component<{appModel?: TestoramaPresenterModel}> {
+class PausedGamePage  extends React.Component<{appModel?: TemplatoPresenterModel}> {
 
     // -------------------------------------------------------------------
     // resumeGame
@@ -66,7 +65,7 @@ class PausedGamePage  extends React.Component<{appModel?: TestoramaPresenterMode
         if (!appModel) return <div>NO APP MODEL</div>;
         return (
             <div>
-                <p>Testorama is paused</p>
+                <p>Templato is paused</p>
                 <p>Current players in the room:</p>
                 <ul>
                     {appModel.players.map(player => (<li key={player.playerId}>{player.name}</li>))}
@@ -107,20 +106,20 @@ class PlayStartAnimationController  extends BaseAnimationController {
 }
 
 @inject("appModel") @observer class PlayingPage 
-    extends React.Component<{appModel?: TestoramaPresenterModel, media: MediaHelper }> {
+    extends React.Component<{appModel?: TemplatoPresenterModel, media: MediaHelper }> {
     private _playStartAnimation: PlayStartAnimationController;
 
     // -------------------------------------------------------------------
     // ctor
     // -------------------------------------------------------------------
-    constructor(props: Readonly<{ appModel?: TestoramaPresenterModel, media: MediaHelper }>) {
+    constructor(props: Readonly<{ appModel?: TemplatoPresenterModel, media: MediaHelper }>) {
         super(props);
         this._playStartAnimation = new  PlayStartAnimationController(()=>{});
         props.appModel!.registerAnimation(this._playStartAnimation);
 
         props.appModel!.onTick.subscribe("animate", (e) => this.animateFrame(e)) 
         props.appModel!.subscribe("ColorChange", "presenterColorChange", () => {
-            props.media.playSound(TestoramaAssets.sounds.ding)
+            props.media.playSound(TemplatoAssets.sounds.ding)
         })
     }
 
@@ -173,7 +172,7 @@ class PlayStartAnimationController  extends BaseAnimationController {
 }
 
 @inject("appModel") @observer class EndOfRoundPage 
-    extends React.Component<{appModel?: TestoramaPresenterModel}> {
+    extends React.Component<{appModel?: TemplatoPresenterModel}> {
     // -------------------------------------------------------------------
     // render
     // -------------------------------------------------------------------
@@ -204,22 +203,22 @@ class PlayStartAnimationController  extends BaseAnimationController {
 @inject("appModel")
 @observer
 export default class Presenter 
-extends React.Component<{appModel?: TestoramaPresenterModel, uiProperties: UIProperties}> {
+extends React.Component<{appModel?: TemplatoPresenterModel, uiProperties: UIProperties}> {
     media: MediaHelper;
 
     // -------------------------------------------------------------------
     // ctor
     // -------------------------------------------------------------------
-    constructor(props: Readonly<{ appModel?: TestoramaPresenterModel; uiProperties: UIProperties; }>) {
+    constructor(props: Readonly<{ appModel?: TemplatoPresenterModel; uiProperties: UIProperties; }>) {
         super(props);
 
         const {appModel} = this.props;
 
         // Set up sound effects
         this.media = new MediaHelper();
-        for(let soundName in TestoramaAssets.sounds)
+        for(let soundName in TemplatoAssets.sounds)
         {
-            this.media.loadSound((TestoramaAssets.sounds as any)[soundName]);
+            this.media.loadSound((TemplatoAssets.sounds as any)[soundName]);
         }
 
         const sfxVolume = 1.0;       
@@ -227,15 +226,15 @@ extends React.Component<{appModel?: TestoramaPresenterModel, uiProperties: UIPro
         let timeAlertLoaded = false;
         appModel?.onTick.subscribe("Timer Watcher", ()=>{
             if(appModel!.secondsLeftInStage > 10) timeAlertLoaded = true; 
-            if( (appModel!.gameState === TestoramaGameState.Playing)
+            if( (appModel!.gameState === TemplatoGameState.Playing)
                 && timeAlertLoaded 
                 && appModel!.secondsLeftInStage <= 10) {
                 timeAlertLoaded = false 
                 this.media.repeatSound("ding.wav", 5, 100);
             }
         })
-        appModel?.subscribe(PresenterGameEvent.PlayerJoined,     "play joined sound", ()=> this.media.playSound(TestoramaAssets.sounds.hello, {volume: sfxVolume * .2}));
-        appModel?.subscribe(TestoramaGameEvent.ResponseReceived,  "play response received sound", ()=> this.media.playSound(TestoramaAssets.sounds.response, {volume: sfxVolume}));
+        appModel?.subscribe(PresenterGameEvent.PlayerJoined,     "play joined sound", ()=> this.media.playSound(TemplatoAssets.sounds.hello, {volume: sfxVolume * .2}));
+        appModel?.subscribe(TemplatoGameEvent.ResponseReceived,  "play response received sound", ()=> this.media.playSound(TemplatoAssets.sounds.response, {volume: sfxVolume}));
 
     }
 
@@ -253,9 +252,9 @@ extends React.Component<{appModel?: TestoramaPresenterModel, uiProperties: UIPro
         {
             case PresenterGameState.Gathering:
                 return <GatheringPlayersPage />
-            case TestoramaGameState.Playing:
+            case TemplatoGameState.Playing:
                 return <PlayingPage media={this.media} />
-            case TestoramaGameState.EndOfRound:
+            case TemplatoGameState.EndOfRound:
             case GeneralGameState.GameOver:
                 return <EndOfRoundPage />
             case GeneralGameState.Paused:
@@ -286,7 +285,7 @@ extends React.Component<{appModel?: TestoramaPresenterModel, uiProperties: UIPro
                 </button>
                 <div className={classNames(styles.roomCode)}>Room Code: {appModel.roomId}</div>
                 <DevUI context={appModel} children={<div></div>} />
-                <div style={{marginLeft: "50px"}}>v{TestoramaVersion}</div>
+                <div style={{marginLeft: "50px"}}>v{TemplatoVersion}</div>
             </div>)
     }
 

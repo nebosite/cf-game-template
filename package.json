@@ -1,0 +1,57 @@
+{
+  "name": "@clusterfun-game/template",
+  "version": "0.1.0",
+  "private": false,
+  "scripts": {
+    "start": "env-cmd -f .env.dev react-scripts start",
+    "startlocal": "env-cmd -f .env.local react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --watchAll=false --passWithNoTests",
+    "eject": "react-scripts eject",
+    "watch": "title Lobby Watcher && node scripts/watch.js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@streamparser/json": "^0.0.8",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.11.59",
+    "@types/react": "^18.0.20",
+    "@types/react-dom": "^18.0.6",
+    "classnames": "^2.3.2",
+    "clusterfun-client": "file:../clusterfun-client",
+    "mobx": "^6.6.2",
+    "mobx-react": "^7.5.3",
+    "react": "^18.2.0",
+    "react-device-detect": "^2.2.2",
+    "react-dom": "^18.2.0",
+    "react-ga4": "^1.4.1",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.8.3",
+    "web-vitals": "^2.1.4"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.3",
+    "chai": "^4.3.6",
+    "env-cmd": "^10.1.0"
+  }
+}

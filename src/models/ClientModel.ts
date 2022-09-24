@@ -1,15 +1,15 @@
 import { observable } from "mobx";
-import { ClusterFunGameProps, ISessionHelper } from "libs";
-import { ITelemetryLogger } from "libs/telemetry/TelemetryLogger";
-import { IStorage } from "libs/storage/StorageHelper";
-import { TestoramaEndOfRoundMessage, TestoramaPlayerActionMessage, TestoramaPlayRequestMessage } from "./TestoramaMessages";
-import { GeneralClientState, ClusterfunClientModel } from "libs/models/ClusterfunClientModel";
+import { ClusterFunGameProps, ISessionHelper } from "clusterfun-client";
+import { ITelemetryLogger } from "clusterfun-client";
+import { IStorage } from "clusterfun-client";
+import { TemplatoEndOfRoundMessage, TemplatoPlayerActionMessage, TemplatoPlayRequestMessage } from "./Messages";
+import { GeneralClientState, ClusterfunClientModel } from "clusterfun-client";
 
 
 // -------------------------------------------------------------------
 // Create the typehelper needed for loading and saving the game
 // -------------------------------------------------------------------
-export const getTestoramaClientTypeHelper = (
+export const getTemplatoClientTypeHelper = (
     sessionHelper: ISessionHelper, 
     gameProps: ClusterFunGameProps
     ) =>
@@ -18,8 +18,8 @@ export const getTestoramaClientTypeHelper = (
         constructType(typeName: string):any {
             switch(typeName)
             {
-                case "TestoramaClientModel":
-                    return new TestoramaClientModel(
+                case "TemplatoClientModel":
+                    return new TemplatoClientModel(
                         sessionHelper,
                         gameProps.playerName || "Player",
                         gameProps.logger,
@@ -44,7 +44,7 @@ export const getTestoramaClientTypeHelper = (
      }
 }
 
-export enum TestoramaClientState {
+export enum TemplatoClientState {
     Playing = "Playing",
     EndOfRound = "EndOfRound",
 }
@@ -54,7 +54,7 @@ const colors = ["white", "red", "orange", "yellow", "blue", "cyan", "magenta", "
 // -------------------------------------------------------------------
 // Client data and logic
 // -------------------------------------------------------------------
-export class TestoramaClientModel extends ClusterfunClientModel  {
+export class TemplatoClientModel extends ClusterfunClientModel  {
 
     ballData = {x: .5, y: .5, xm:.01, ym:.01, color: "#ffffff"}
 
@@ -62,15 +62,15 @@ export class TestoramaClientModel extends ClusterfunClientModel  {
     // ctor 
     // -------------------------------------------------------------------
     constructor(sessionHelper: ISessionHelper, playerName: string, logger: ITelemetryLogger, storage: IStorage) {
-        super("TestoramaClient", sessionHelper, playerName, logger, storage);
+        super("TemplatoClient", sessionHelper, playerName, logger, storage);
 
         this.ballData.x = this.randomDouble(1.0);
         this.ballData.y = this.randomDouble(1.0);
         this.ballData.xm = (this.randomDouble(.01) + 0.005) * (this.randomInt(2) ? 1 : -1) ;
         this.ballData.ym = (this.randomDouble(.01) + 0.005) * (this.randomInt(2) ? 1 : -1) ;
         this.ballData.color = this.randomItem(colors);
-        sessionHelper.addListener(TestoramaPlayRequestMessage, playerName, this.handlePlayRequestMessage);
-        sessionHelper.addListener(TestoramaEndOfRoundMessage, playerName, this.handleEndOfRoundMessage);
+        sessionHelper.addListener(TemplatoPlayRequestMessage, playerName, this.handlePlayRequestMessage);
+        sessionHelper.addListener(TemplatoEndOfRoundMessage, playerName, this.handleEndOfRoundMessage);
     }
 
     // -------------------------------------------------------------------
@@ -100,8 +100,8 @@ export class TestoramaClientModel extends ClusterfunClientModel  {
     // -------------------------------------------------------------------
     // handleEndOfRoundMessage
     // -------------------------------------------------------------------
-    protected handleEndOfRoundMessage = (message: TestoramaEndOfRoundMessage) => {
-        this.gameState = TestoramaClientState.EndOfRound;
+    protected handleEndOfRoundMessage = (message: TemplatoEndOfRoundMessage) => {
+        this.gameState = TemplatoClientState.EndOfRound;
 
         this.saveCheckpoint();
         this.ackMessage(message);
@@ -110,12 +110,12 @@ export class TestoramaClientModel extends ClusterfunClientModel  {
     // -------------------------------------------------------------------
     // handlePlayRequestMessage 
     // -------------------------------------------------------------------
-    protected handlePlayRequestMessage = (message: TestoramaPlayRequestMessage) => {
+    protected handlePlayRequestMessage = (message: TemplatoPlayRequestMessage) => {
         if(this.gameState === GeneralClientState.WaitingToStart) {
             this.logger.logEvent("Client", "Start");
         }
         this.roundNumber = message.roundNumber;
-        this.gameState = TestoramaClientState.Playing;
+        this.gameState = TemplatoClientState.Playing;
 
         this.saveCheckpoint();
         this.ackMessage(message);
@@ -125,7 +125,7 @@ export class TestoramaClientModel extends ClusterfunClientModel  {
     // sendAction 
     // -------------------------------------------------------------------
     protected sendAction(action: string, actionData: any = null) {
-        const message = new TestoramaPlayerActionMessage(
+        const message = new TemplatoPlayerActionMessage(
             {
                 sender: this.session.personalId,
                 roundNumber: this.roundNumber,

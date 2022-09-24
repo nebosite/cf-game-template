@@ -1,24 +1,24 @@
 import { observable } from "mobx"
 import { 
-    TestoramaPlayRequestMessage,
-    TestoramaPlayerActionMessage,
-    TestoramaEndOfRoundMessage, } from "./TestoramaMessages";
-import { ClusterFunGameProps, ISessionHelper } from "libs";
-import { ITelemetryLogger } from "libs/telemetry/TelemetryLogger";
-import { IStorage } from "libs/storage/StorageHelper";
-import { PLAYTIME_MS } from "./TestoramaGameSettings";
-import { ClusterFunPlayer, ClusterfunPresenterModel, PresenterGameState } from "libs/models/ClusterfunPresenterModel";
-import { GeneralGameState } from "libs/models/BaseGameModel";
-import { ClusterFunGameOverMessage } from "libs/comms"; 
+    TemplatoPlayRequestMessage,
+    TemplatoPlayerActionMessage,
+    TemplatoEndOfRoundMessage, } from "./Messages";
+import { ClusterFunGameProps, ISessionHelper } from "clusterfun-client";
+import { ITelemetryLogger } from "clusterfun-client";
+import { IStorage } from "clusterfun-client";
+import { PLAYTIME_MS } from "./GameSettings";
+import { ClusterFunPlayer, ClusterfunPresenterModel, PresenterGameState } from "clusterfun-client";
+import { GeneralGameState } from "clusterfun-client";
+import { ClusterFunGameOverMessage } from "clusterfun-client"; 
 
-export enum TestoramaPlayerStatus {
+export enum TemplatoPlayerStatus {
     Unknown = "Unknown",
     WaitingForStart = "WaitingForStart",
 }
 
-export class TestoramaPlayer extends ClusterFunPlayer {
+export class TemplatoPlayer extends ClusterFunPlayer {
     @observable totalScore = 0;
-    @observable status = TestoramaPlayerStatus.Unknown;
+    @observable status = TemplatoPlayerStatus.Unknown;
     @observable message = "";
     @observable colorStyle= "#ffffff";
     @observable x = 0;
@@ -28,7 +28,7 @@ export class TestoramaPlayer extends ClusterFunPlayer {
 // -------------------------------------------------------------------
 // The Game state  
 // -------------------------------------------------------------------
-export enum TestoramaGameState {
+export enum TemplatoGameState {
     Playing = "Playing",
     EndOfRound = "EndOfRound",
 }
@@ -36,14 +36,14 @@ export enum TestoramaGameState {
 // -------------------------------------------------------------------
 // Game events
 // -------------------------------------------------------------------
-export enum TestoramaGameEvent {
+export enum TemplatoGameEvent {
     ResponseReceived = "ResponseReceived",
 }
 
 // -------------------------------------------------------------------
 // Create the typehelper needed for loading and saving the game
 // -------------------------------------------------------------------
-export const getTestoramaPresenterTypeHelper = (
+export const getTemplatoPresenterTypeHelper = (
     sessionHelper: ISessionHelper, 
     gameProps: ClusterFunGameProps
     ) =>
@@ -52,15 +52,15 @@ export const getTestoramaPresenterTypeHelper = (
         constructType(typeName: string):any {
             switch(typeName)
             {
-                case "TestoramaPresenterModel": return new TestoramaPresenterModel( sessionHelper, gameProps.logger, gameProps.storage);
-                case "TestoramaPlayer": return new TestoramaPlayer();
+                case "TemplatoPresenterModel": return new TemplatoPresenterModel( sessionHelper, gameProps.logger, gameProps.storage);
+                case "TemplatoPlayer": return new TemplatoPlayer();
                 // TODO: add your custom type handlers here
             }
             return null;
         },
         shouldStringify(typeName: string, propertyName: string, object: any):boolean
         {
-            if(object instanceof TestoramaPresenterModel)
+            if(object instanceof TemplatoPresenterModel)
             {
                 const doNotSerializeMe = 
                 [
@@ -75,7 +75,7 @@ export const getTestoramaPresenterTypeHelper = (
         },
         reconstitute(typeName: string, propertyName: string, rehydratedObject: any)
         {
-            if(typeName === "TestoramaPresenterModel")
+            if(typeName === "TemplatoPresenterModel")
             {
                 // TODO: if there are any properties that need special treatment on 
                 // deserialization, you can override it here.  e.g.:
@@ -93,7 +93,7 @@ export const getTestoramaPresenterTypeHelper = (
 // -------------------------------------------------------------------
 // presenter data and logic
 // -------------------------------------------------------------------
-export class TestoramaPresenterModel extends ClusterfunPresenterModel<TestoramaPlayer> {
+export class TemplatoPresenterModel extends ClusterfunPresenterModel<TemplatoPlayer> {
 
     // -------------------------------------------------------------------
     // ctor 
@@ -103,10 +103,10 @@ export class TestoramaPresenterModel extends ClusterfunPresenterModel<TestoramaP
         logger: ITelemetryLogger, 
         storage: IStorage)
     {
-        super("Testorama", sessionHelper, logger, storage);
-        console.log(`Constructing TestoramaPresenterModel ${this.gameState}`)
+        super("Templato", sessionHelper, logger, storage);
+        console.log(`Constructing TemplatoPresenterModel ${this.gameState}`)
 
-        sessionHelper.addListener(TestoramaPlayerActionMessage, "answer", this.handlePlayerAction);
+        sessionHelper.addListener(TemplatoPlayerActionMessage, "answer", this.handlePlayerAction);
 
         this.minPlayers = 2;
     }
@@ -121,9 +121,9 @@ export class TestoramaPresenterModel extends ClusterfunPresenterModel<TestoramaP
     // -------------------------------------------------------------------
     //  createFreshPlayerEntry
     // -------------------------------------------------------------------
-    createFreshPlayerEntry(name: string, id: string): TestoramaPlayer
+    createFreshPlayerEntry(name: string, id: string): TemplatoPlayer
     {
-        const newPlayer = new TestoramaPlayer();
+        const newPlayer = new TemplatoPlayer();
         newPlayer.playerId = id;
         newPlayer.name = name;
 
@@ -153,7 +153,7 @@ export class TestoramaPresenterModel extends ClusterfunPresenterModel<TestoramaP
     {
         if (this.isStageOver) {
             switch(this.gameState) {
-                case TestoramaGameState.Playing: 
+                case TemplatoGameState.Playing: 
                     this.finishPlayingRound(); 
                     this.saveCheckpoint();
                     break;
@@ -165,8 +165,8 @@ export class TestoramaPresenterModel extends ClusterfunPresenterModel<TestoramaP
     //  finishPlayingRound
     // -------------------------------------------------------------------
     finishPlayingRound() {
-        this.gameState = TestoramaGameState.EndOfRound;
-        this.sendToEveryone((p,ie) => new TestoramaEndOfRoundMessage({ sender: this.session.personalId, roundNumber: this.currentRound}));
+        this.gameState = TemplatoGameState.EndOfRound;
+        this.sendToEveryone((p,ie) => new TemplatoEndOfRoundMessage({ sender: this.session.personalId, roundNumber: this.currentRound}));
     }
 
     // -------------------------------------------------------------------
@@ -174,12 +174,12 @@ export class TestoramaPresenterModel extends ClusterfunPresenterModel<TestoramaP
     // -------------------------------------------------------------------
     startNextRound = () =>
     {
-        this.gameState = TestoramaGameState.Playing;
+        this.gameState = TemplatoGameState.Playing;
         this.timeOfStageEnd = this.gameTime_ms + PLAYTIME_MS;
         this.currentRound++;
 
         this.players.forEach((p,i) => {
-            p.status = TestoramaPlayerStatus.WaitingForStart;
+            p.status = TemplatoPlayerStatus.WaitingForStart;
             p.pendingMessage = undefined;
             p.message = "";
             p.colorStyle = "white";
@@ -194,7 +194,7 @@ export class TestoramaPresenterModel extends ClusterfunPresenterModel<TestoramaP
         }    
         else {
             const payload = { sender: this.session.personalId, customText: "Hi THere", roundNumber: this.currentRound}
-            this.sendToEveryone((p,ie) =>  new TestoramaPlayRequestMessage(payload))
+            this.sendToEveryone((p,ie) =>  new TemplatoPlayRequestMessage(payload))
             this.saveCheckpoint();
         }
 
@@ -203,7 +203,7 @@ export class TestoramaPresenterModel extends ClusterfunPresenterModel<TestoramaP
     // -------------------------------------------------------------------
     //  handlePlayerAction
     // -------------------------------------------------------------------
-    handlePlayerAction = (message: TestoramaPlayerActionMessage) => {
+    handlePlayerAction = (message: TemplatoPlayerActionMessage) => {
         const player = this.players.find(p => p.playerId === message.sender);
         if(!player) {
             console.log("No player found for message: " + JSON.stringify(message));

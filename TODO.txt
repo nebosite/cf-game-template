@@ -9,3 +9,23 @@
     [ ] Edit the Readme to explain how to turn this template into a custom game project
         [ ] Maybe create a script to do this automagically
             - The script could live in the frontend project and just copy generically from github to create a new game?
+
+Example manifest:
+{
+    client: {
+        package: "@clusterfun/client",
+        version: "^2.0.0"
+    },
+    games: [
+        {
+            package: "@mycfgames/foomius",
+            version: "^3.0.0",
+            tags: "debug, alpha"
+        },
+        {
+            package: "@mycfgames/lexible",
+            version: "^1.0.0",
+            tags: "release"
+        }
+    ]
+}

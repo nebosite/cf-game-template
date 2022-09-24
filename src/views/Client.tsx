@@ -1,14 +1,14 @@
 // App Navigation handled here
 import React from "react";
 import { observer, inject } from "mobx-react";
-import { TestoramaClientModel, TestoramaClientState } from "../models/TestoramaClientModel";
-import { UIProperties, UINormalizer } from "libs";
-import styles from './TestoramaClient.module.css';
-import { ErrorBoundary } from "libs/components/ErrorBoundary";
-import { SafeBrowser } from "libs/Browser/SafeBrowser";
-import { GeneralClientState } from "libs/models/ClusterfunClientModel";
-import { GeneralGameState } from "libs/models/BaseGameModel";
-import ClusterCanvas from "libs/components/ClusterCanvas";
+import { TemplatoClientModel, TemplatoClientState } from "../models/ClientModel";
+import { UIProperties, UINormalizer } from "clusterfun-client";
+import styles from './Client.module.css';
+import { ErrorBoundary } from "clusterfun-client";
+import { SafeBrowser } from "clusterfun-client";
+import { GeneralClientState } from "clusterfun-client";
+import { GeneralGameState } from "clusterfun-client";
+import { ClusterCanvas } from "clusterfun-client";
 import classNames from "classnames";
 
 
@@ -17,7 +17,7 @@ import classNames from "classnames";
 // -------------------------------------------------------------------
 @inject("appModel")
 @observer
-class GameScreen extends React.Component<{appModel?: TestoramaClientModel}> 
+class GameScreen extends React.Component<{appModel?: TemplatoClientModel}> 
 {
     canvasDomId: string;
     w = 100;
@@ -27,7 +27,7 @@ class GameScreen extends React.Component<{appModel?: TestoramaClientModel}>
     // -------------------------------------------------------------------
     // ctor
     // ------------------------------------------------------------------- 
-    constructor(props: {appModel?: TestoramaClientModel})
+    constructor(props: {appModel?: TemplatoClientModel})
     {
         super(props);
 
@@ -59,7 +59,7 @@ class GameScreen extends React.Component<{appModel?: TestoramaClientModel}>
     // -------------------------------------------------------------------
     animateFrame = (elapsed_ms: number) => {
         const {appModel} = this.props;
-        if(appModel?.gameState !== TestoramaClientState.Playing) return;
+        if(appModel?.gameState !== TemplatoClientState.Playing) return;
         if(!this.canvasContext) return;
 
         // Clear canvas
@@ -118,7 +118,7 @@ class GameScreen extends React.Component<{appModel?: TestoramaClientModel}>
 @inject("appModel")
 @observer
 export default class Client 
-  extends React.Component<{appModel?: TestoramaClientModel, uiProperties: UIProperties}> {
+  extends React.Component<{appModel?: TemplatoClientModel, uiProperties: UIProperties}> {
     lastState:string = GeneralGameState.Unknown;
     containerOffset = {left: 0, top: 0};
 
@@ -162,10 +162,10 @@ export default class Client
                     Sit tight, we are waiting for the host to start the game...
                     </div>
                 </React.Fragment>);  
-            case TestoramaClientState.Playing:
+            case TemplatoClientState.Playing:
                 this.alertUser();
                 return <GameScreen />
-            case TestoramaClientState.EndOfRound:
+            case TemplatoClientState.EndOfRound:
                 this.alertUser();
                 return <div>Round is over... </div>
             case GeneralGameState.GameOver:
@@ -201,7 +201,7 @@ export default class Client
                     virtualWidth={1080}>
                     <div className={styles.gameclient}>
                         <div className={classNames(styles.divRow, styles.topbar)}>
-                            <span className={classNames(styles.gametitle)}>Testorama</span> 
+                            <span className={classNames(styles.gametitle)}>Templato</span> 
                             <span>{appModel?.playerName}</span>
                             <button className={classNames(styles.quitbutton)} onClick={()=>appModel?.quitApp()}>X</button>
                         </div>
